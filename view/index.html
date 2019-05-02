@@ -1,0 +1,102 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+
+<head>
+	<title>QRCode View</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+	<script type="text/javascript" src="jquery.min.js"></script>
+	<script type="text/javascript" src="qrcode.js"></script>
+</head>
+
+<body>
+	<select id="select">
+		<option value="1">1</option>
+		<option value="2">2</option>
+		<option value="3">3</option>
+		<option value="4">4</option>
+		<option value="5">5</option>
+	</select><br><br>
+	<button id="button" onclick="check_generation();">Gerar</button>
+	<button id="button" onclick="stop_generate();">Terminar</button><br />
+	<div id="qrcode" style="margin-left:700px; width:500px; height:500px; margin-top:100px;"></div>
+	<div id="qrcode_text" style="margin-left:850px; width:100px; height:100px; margin-top:100px;"></div>
+
+	<script type="text/javascript">
+		var interval = 0;
+
+		function check_generation() {
+			if (interval == 0)
+				start_generate();
+		}
+
+		// Função para começar a gerar qrcodes
+		function start_generate() {
+			var id = document.getElementById("select").value;
+			var qrcode = new QRCode(document.getElementById("qrcode"), {
+				width: 500,
+				height: 500
+			});
+			// Chama da API conteudo do primeiro qrcode
+			create_aula(qrcode, id);
+			// Apartir do primeiro qrcode vai buscar um novo a cada 5s
+			interval = setInterval(generate_qrCode, 5000, qrcode, id);
+		}
+
+		// Função para terminar de gerar qrcodes
+		function stop_generate() {
+			document.getElementById("qrcode").innerHTML = "";
+			document.getElementById("qrcode_text").innerHTML = "";
+			clearInterval(interval);
+			interval = 0;
+		}
+
+		function generate_qrCode(qrcode, id) {
+			$.ajax({
+				url: "http://192.168.99.100:8080/redoAula",
+				dataType: 'json',
+				type: 'POST',
+				data: id,
+				contentType: 'application/json; charset=utf-8',
+				success: function (data) {
+					console.log(data);
+					qrcode.makeCode(data);
+					document.getElementById("qrcode_text").innerHTML = "<b>" + data + "</b>";
+				}
+			})
+		}
+
+		function create_aula(qrcode, id) {
+			$.ajax({
+				url: "http://192.168.99.100:8081/sumario/getsumario",
+				dataType: 'json',
+				type: 'POST',
+				data: id,
+				contentType: 'application/json; charset=utf-8',
+				success: function (data) {
+					var aula = {
+						"id_sumario": data.idSumario,
+						"horaInicio": data.horaInicio,
+						"horaFim": data.horaFim
+					}
+					console.log(aula);
+					$.ajax({
+						url: "http://192.168.99.100:8080/newAula",
+						dataType: 'json',
+						type: 'POST',
+						data: JSON.stringify(aula),
+						dataType: "html",
+						contentType: 'application/json',
+						mimeType: 'application/json',
+						success: function (data) {
+							console.log(data);
+							qrcode.makeCode(data);
+							document.getElementById("qrcode_text").innerHTML = "<b>" + data + "</b>";
+						}
+					})
+				}
+			})
+		}
+	</script>
+</body>
