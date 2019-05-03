@@ -54,7 +54,7 @@
 
 		function generate_qrCode(qrcode, id) {
 			$.ajax({
-				url: "lpiq.ufp.pt/redoAula",
+				url: "http://lpiq.ufp.pt/redoAula",
 				dataType: 'json',
 				type: 'POST',
 				data: id,
@@ -69,7 +69,7 @@
 
 		function create_aula(qrcode, id) {
 			$.ajax({
-				url: "lpia.ufp.pt/sumario/getsumario",
+				url: "http://lpia.ufp.pt/sumario/getsumario",
 				dataType: 'json',
 				type: 'POST',
 				data: id,
@@ -82,7 +82,7 @@
 					}
 					console.log(aula);
 					$.ajax({
-						url: "lpiq.ufp.pt/newAula",
+						url: "http://lpiq.ufp.pt/newAula",
 						dataType: 'json',
 						type: 'POST',
 						data: JSON.stringify(aula),
