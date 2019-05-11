@@ -1,102 +1,74 @@
-<!DOCTYPE html
-	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<!doctype html>
+<html lang="en">
 
 <head>
-	<title>QRCode View</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<!-- QRCode JS -->
 	<script type="text/javascript" src="jquery.min.js"></script>
 	<script type="text/javascript" src="qrcode.js"></script>
+	<title>QRCode View</title>
 </head>
 
 <body>
-	<select id="select">
-		<option value="1">1</option>
-		<option value="2">2</option>
-		<option value="3">3</option>
-		<option value="4">4</option>
-		<option value="5">5</option>
-	</select><br><br>
-	<button id="button" onclick="check_generation();">Gerar - teste</button>
-	<button id="button" onclick="stop_generate();">Terminar</button><br />
-	<div id="qrcode" style="margin-left:700px; width:500px; height:500px; margin-top:100px;"></div>
-	<div id="qrcode_text" style="margin-left:850px; width:100px; height:100px; margin-top:100px;"></div>
+	<nav class="navbar navbar-light bg-light">
+		<span class="navbar-brand mb-0 h1">Validador de Presenças - QRCode</span>
+	</nav>
+	<div class="card">
+		<div class="card-body">
+			<form class="form-inline mb-5">
+				<div class="form-group">
+					<label class="my-1 mr-2" for="select">Sumários:</label>
+					<select id="select" class="custom-select my-1 mr-sm-2">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+					</select>
+				</div>
+				<button type="button" class="btn btn-outline-success my-1 mr-sm-2" id="buttonG"
+					onclick="check_generation();">Gerar</button>
+				<button type="button" class="btn btn-outline-danger my-1 mr-sm-2" id="buttonT"
+					onclick="stop_generate();">Terminar</button>
+				<button type="button" class="btn btn-success btn" id="sendButton" onclick="show_presencas()"
+					disabled>Enviar
+					Presenças</button>
+			</form>
+			<div id="table" class="container" style="display: none;">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th scope="col">#</th>
+							<th scope="col">Número</th>
+							<th scope="col">Nome</th>
+							<th scope="col">Presente</th>
+						</tr>
+					</thead>
+					<tbody id="body">
 
-	<script type="text/javascript">
-		var interval = 0;
+					</tbody>
+				</table>
+			</div>
+			<div id="qrcode" style="margin-left:700px; width:500px; height:500px; margin-top:100px;"></div>
 
-		function check_generation() {
-			if (interval == 0)
-				start_generate();
-		}
+		</div>
+	</div>
 
-		// Função para começar a gerar qrcodes
-		function start_generate() {
-			var id = document.getElementById("select").value;
-			var qrcode = new QRCode(document.getElementById("qrcode"), {
-				width: 500,
-				height: 500
-			});
-			// Chama da API conteudo do primeiro qrcode
-			create_aula(qrcode, id);
-			// Apartir do primeiro qrcode vai buscar um novo a cada 5s
-			interval = setInterval(generate_qrCode, 5000, qrcode, id);
-		}
-
-		// Função para terminar de gerar qrcodes
-		function stop_generate() {
-			document.getElementById("qrcode").innerHTML = "";
-			document.getElementById("qrcode_text").innerHTML = "";
-			clearInterval(interval);
-			interval = 0;
-		}
-
-		function generate_qrCode(qrcode, id) {
-			$.ajax({
-				url: "http://lpiq.ufp.pt/redoAula",
-				dataType: 'json',
-				type: 'POST',
-				data: id,
-				contentType: 'application/json; charset=utf-8',
-				success: function (data) {
-					console.log(data);
-					qrcode.makeCode(data);
-					document.getElementById("qrcode_text").innerHTML = "<b>" + data + "</b>";
-				}
-			})
-		}
-
-		function create_aula(qrcode, id) {
-			$.ajax({
-				url: "http://lpia.ufp.pt/sumario/getsumario",
-				dataType: 'json',
-				type: 'POST',
-				data: id,
-				contentType: 'application/json; charset=utf-8',
-				success: function (data) {
-					var aula = {
-						"id_sumario": data.idSumario,
-						"horaInicio": data.horaInicio,
-						"horaFim": data.horaFim
-					}
-					console.log(aula);
-					$.ajax({
-						url: "http://lpiq.ufp.pt/newAula",
-						dataType: 'json',
-						type: 'POST',
-						data: JSON.stringify(aula),
-						dataType: "html",
-						contentType: 'application/json',
-						mimeType: 'application/json',
-						success: function (data) {
-							console.log(data);
-							qrcode.makeCode(data);
-							document.getElementById("qrcode_text").innerHTML = "<b>" + data + "</b>";
-						}
-					})
-				}
-			})
-		}
+	<!-- Optional JavaScript -->
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+		integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
 	</script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+		integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+	</script>
+	<script type="text/javascript" src="qrcodeApi.js"></script>
 </body>
+
+</html>
