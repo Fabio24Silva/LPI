@@ -32,7 +32,7 @@ function stop_generate() {
 
 function generate_qrCode(qrcode, id) {
     $.ajax({
-        url: API + ":8080/redoAula",
+        url: API + "/redoAula",
         dataType: 'json',
         type: 'POST',
         data: id,
@@ -48,7 +48,7 @@ function generate_qrCode(qrcode, id) {
 
 function create_aula(qrcode, id) {
     $.ajax({
-        url: SI + ":8081/sumario/getsumario",
+        url: SI + "/sumario/getsumario",
         dataType: 'json',
         type: 'POST',
         data: id,
@@ -63,7 +63,7 @@ function create_aula(qrcode, id) {
             }
             console.log(aula);
             $.ajax({
-                url: API + ":8080/newAula",
+                url: API + "/newAula",
                 dataType: 'json',
                 type: 'POST',
                 data: JSON.stringify(aula),
@@ -82,7 +82,7 @@ function create_aula(qrcode, id) {
 // Função para mostrar tabela de presenças
 function show_presencas() {
     $.ajax({
-        url: API + ":8080/closeAula",
+        url: API + "/closeAula",
         dataType: 'json',
         type: 'POST',
         data: id,
